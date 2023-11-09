@@ -1,5 +1,6 @@
 pipeline {
     agent none
+
     stages {
         stage('Integration UI Test') {
             parallel {
@@ -7,17 +8,15 @@ pipeline {
                     agent any
                     steps {
                         script {
-                            // Add debugging information
                             echo "Current user: ${sh(script: 'whoami', returnStdout: true).trim()}"
                             echo "Current workspace: ${env.WORKSPACE}"
-                            echo "Permissions before chmod:"
-                            sh "ls -lR ${env.WORKSPACE}/jenkins/scripts"
 
-                            // Uncomment the next line to apply chmod recursively
-                            // sh "chmod +x -R ${env.WORKSPACE}"
-                            
-                            // Add more debugging information after chmod
-                            echo "Permissions after chmod:"
+                            // Manually change permissions
+                            sh "chmod +x ${env.WORKSPACE}/jenkins/scripts/deploy.sh"
+                            sh "chmod +x ${env.WORKSPACE}/jenkins/scripts/kill.sh"
+
+                            // Debugging information
+                            echo "Permissions after manual chmod:"
                             sh "ls -lR ${env.WORKSPACE}/jenkins/scripts"
 
                             sh './jenkins/scripts/deploy.sh'
@@ -26,11 +25,13 @@ pipeline {
                         }
                     }
                 }
+
                 stage('Headless Browser Test') {
                     agent {
                         docker {
-                            image 'maven:3-alpine' 
-                            args '-v /root/.m2:/root/.m2' 
+                            image 'maven:3-alpine'
+                            args '-v /root/.m2:/root/.m2'
+                            user 'root' // Specify a user with sufficient permissions
                         }
                     }
                     steps {
