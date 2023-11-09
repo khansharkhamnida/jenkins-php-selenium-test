@@ -31,12 +31,14 @@ pipeline {
                         docker {
                             image 'maven:3-alpine'
                             args '-v /root/.m2:/root/.m2'
-                            user 'root' // Specify a user with sufficient permissions
                         }
                     }
                     steps {
-                        sh 'mvn -B -DskipTests clean package'
-                        sh 'mvn test'
+                        script {
+                            // Specify a user with sufficient permissions inside the Docker container
+                            sh 'mvn -B -DskipTests clean package'
+                            sh 'mvn test'
+                        }
                     }
                     post {
                         always {
