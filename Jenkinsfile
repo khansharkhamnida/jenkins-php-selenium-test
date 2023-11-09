@@ -20,8 +20,15 @@ pipeline {
       }
      }
      steps {
-      sh 'mvn -B -DskipTests clean package'
-      sh 'mvn test'
+      script {
+        // Make this stage dependent on the 'Deploy' stage completion
+        if (currentBuild.resultIsBetterOrEqualTo('SUCCESS')) {
+          sh 'mvn -B -DskipTests clean package'
+          sh 'mvn test'
+        } else {
+          echo 'Skipping Headless Browser Test due to failure in Deploy stage.'
+        }
+      }
      }
      post {
       always {
