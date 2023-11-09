@@ -11,19 +11,13 @@ pipeline {
                             echo "Current user: ${sh(script: 'whoami', returnStdout: true).trim()}"
                             echo "Current workspace: ${env.WORKSPACE}"
 
-                            // Manually change permissions within the same shell
-                            sh """
-                                chmod +x ${env.WORKSPACE}/jenkins/scripts/deploy.sh
-                                chmod +x ${env.WORKSPACE}/jenkins/scripts/kill.sh
-                            """
-
-                            // Debugging information
-                            echo "Permissions after manual chmod:"
-                            sh "ls -lR ${env.WORKSPACE}/jenkins/scripts"
-
-                            sh './jenkins/scripts/deploy.sh'
-                            input message: 'Finished using the web site? (Click "Proceed" to continue)'
-                            sh './jenkins/scripts/kill.sh'
+                            // Run deployment script and set execute permissions
+                            sh '''
+                                ./jenkins/scripts/deploy.sh
+                                chmod +x ./jenkins/scripts/deploy.sh
+                                ./jenkins/scripts/kill.sh
+                                chmod +x ./jenkins/scripts/kill.sh
+                            '''
                         }
                     }
                 }
