@@ -11,9 +11,11 @@ pipeline {
                             echo "Current user: ${sh(script: 'whoami', returnStdout: true).trim()}"
                             echo "Current workspace: ${env.WORKSPACE}"
 
-                            // Manually change permissions
-                            sh "chmod +x ${env.WORKSPACE}/jenkins/scripts/deploy.sh"
-                            sh "chmod +x ${env.WORKSPACE}/jenkins/scripts/kill.sh"
+                            // Manually change permissions within the same shell
+                            sh """
+                                chmod +x ${env.WORKSPACE}/jenkins/scripts/deploy.sh
+                                chmod +x ${env.WORKSPACE}/jenkins/scripts/kill.sh
+                            """
 
                             // Debugging information
                             echo "Permissions after manual chmod:"
